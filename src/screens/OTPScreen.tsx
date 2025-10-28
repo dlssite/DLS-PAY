@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Alert, TextInput, SafeAreaView, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Button from '../components/Button';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 
 type RootStackParamList = {
   OTP: undefined;
@@ -16,6 +16,7 @@ export default function OTPScreen() {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<OTPScreenNavigationProp>();
+  const { theme, isDarkMode } = useTheme();
 
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
@@ -39,9 +40,9 @@ export default function OTPScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
       <View style={{ flex: 1, padding: theme.spacing.xl }}>
-        <View style={{ alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
+        <View style={{ marginTop: theme.spacing.lg, alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
           <View style={{
             width: 80,
             height: 80,

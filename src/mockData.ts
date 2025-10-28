@@ -1,3 +1,4 @@
+
 // Mock data for testing the E-Wallet app before implementing authentication and database
 
 export interface MockUser {
@@ -127,6 +128,41 @@ export const mockTransactions: MockTransaction[] = [
     status: 'completed',
   },
 ];
+
+// Mock Promotions
+export const activePromotions = [
+  {
+    title: 'Legend of Elements',
+    description: 'Receive an extra 5% Bonus in all your purchases.',
+    endsIn: { days: 0, hours: 11, minutes: 36, seconds: 45 },
+    image: require('../assets/adaptive-icon.png'), // Placeholder image
+  },
+  {
+    title: 'Space Voyager',
+    description: 'Get a 10% discount on all in-app items.',
+    endsIn: { days: 1, hours: 8, minutes: 15, seconds: 30 },
+    image: require('../assets/splash-icon.png'), // Placeholder image
+  },
+  {
+    title: 'Mystic Gems',
+    description: 'Unlock a free treasure chest with any purchase over $20.',
+    endsIn: { days: 2, hours: 4, minutes: 55, seconds: 10 },
+    image: require('../assets/adaptive-icon.png'), // Placeholder image
+  },
+  {
+    title: 'Cybernetic Heroes',
+    description: 'Double your XP for the next 24 hours.',
+    endsIn: { days: 0, hours: 23, minutes: 59, seconds: 59 },
+    image: require('../assets/splash-icon.png'), // Placeholder image
+  },
+  {
+    title: 'Galactic Empires',
+    description: 'Special offer: Buy one starship, get one 50% off.',
+    endsIn: { days: 5, hours: 12, minutes: 0, seconds: 0 },
+    image: require('../assets/adaptive-icon.png'), // Placeholder image
+  },
+];
+
 
 // Mock API functions
 export const mockApi = {
@@ -289,3 +325,31 @@ export const mockApi = {
   getAllUsers: () => mockUsers,
   getAllTransactions: () => mockTransactions,
 };
+
+export interface CompatibleGame {
+  title: string;
+  category: string;
+  bannerUrl: string;
+  iconUrl: string;
+}
+
+export const compatibleGames: CompatibleGame[] = [
+  {
+    title: 'Legend of Elements',
+    category: 'Role Playing',
+    bannerUrl: 'https://cdn.discordapp.com/attachments/1254101929383559168/1258529210795298836/d_catation_d_une_illustration_de_jeu_mobile_pour_un_jeu_fant_f2747385-5d3c-42b7-9571-08197f884393.png?ex=66886364&is=668711e4&hm=4a703d1469e71e7552fa10e75551936c53e0294b8e8316c39b7de2683935293d&',
+    iconUrl: 'https://cdn.discordapp.com/attachments/1254101929383559168/1258529555708842065/d_catation_d_une_illustration_de_jeu_mobile_pour_un_jeu_fant_33e215f7-6f02-4299-8742-3e536c4b9d03.png?ex=668863b7&is=66871237&hm=c1092a4078500c28373b5e408544a496f332c9431e6191c06f3b5849925e59b5&',
+  },
+  {
+    title: 'Space Voyager',
+    category: 'Sci-Fi',
+    bannerUrl: 'https://cdn.discordapp.com/attachments/1254101929383559168/1258529209568923769/d_catation_d_une_illustration_de_jeu_mobile_pour_un_jeu_fant_d758f331-5079-4556-9a56-2e92a23363ad.png?ex=66886364&is=668711e4&hm=214088998246d1b7617b0d91253a6e97495bca5c5ec94a3a60c868d4a9f997c4&',
+    iconUrl: 'https://cdn.discordapp.com/attachments/1254101929383559168/1258529554366664744/d_catation_d_une_illustration_de_jeu_mobile_pour_un_jeu_fant_91c782b6-a4f6-4a46-8883-9d2c12513476.png?ex=668863b6&is=66871236&hm=53c13b137d532a2f91a566f12537a70ce238b68832a875a36371c66289045768&',
+  },
+    {
+    title: 'Mystic Gems',
+    category: 'Puzzle',
+    bannerUrl: 'https://cdn.discordapp.com/attachments/1254101929383559168/1258529208398843914/d_catation_d_une_illustration_de_jeu_mobile_pour_un_jeu_fant_01b44c6c-0027-448f-9556-5511a2f602b9.png?ex=66886363&is=668711e3&hm=9a45e99880f8364962947f60759ce4e3f42c4b8b809a74421d2146fec3238c35&',
+    iconUrl: 'https://cdn.discordapp.com/attachments/1254101929383559168/1258529553099980830/d_catation_d_une_illustration_de_jeu_mobile_pour_un_jeu_fant_c7b74f07-a36c-486d-92d1-0865e9d2f2dc.png?ex=668863b6&is=66871236&hm=80a068a41785ee634b07f2b96c738e658e4d2a1383794b62f75a7b8e1f574d53&',
+  },
+];

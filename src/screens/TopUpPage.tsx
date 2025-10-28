@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Alert, ScrollView, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { RootState } from '../store';
 import { updateBalance } from '../store/slices/walletSlice';
 import { addTransaction } from '../store/slices/transactionSlice';
@@ -10,30 +8,27 @@ import { walletService } from '../services/walletService';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { theme } from '../theme';
+import { Ionicons } from '@expo/vector-icons';
 
-type RootStackParamList = {
-  Deposit: undefined;
-  MainTabs: undefined;
-};
+interface TopUpPageProps {
+  onBack: () => void;
+}
 
-type DepositScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Deposit'>;
-
-export default function DepositScreen() {
+const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState('card');
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const navigation = useNavigation<DepositScreenNavigationProp>();
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const handleDeposit = async () => {
+  const handleTopUp = async () => {
     if (!amount) {
       Alert.alert('Error', 'Please enter an amount');
       return;
     }
 
-    const depositAmount = parseFloat(amount);
-    if (depositAmount <= 0) {
+    const topUpAmount = parseFloat(amount);
+    if (topUpAmount <= 0) {
       Alert.alert('Error', 'Please enter a valid amount');
       return;
     }
@@ -41,19 +36,19 @@ export default function DepositScreen() {
     setLoading(true);
 
     try {
-      await walletService.depositMoney(user.uid, depositAmount, method);
+      await walletService.depositMoney(user.uid, topUpAmount, method);
 
-      dispatch(updateBalance(depositAmount));
+      dispatch(updateBalance(topUpAmount));
       dispatch(addTransaction({
         id: Date.now().toString(),
         type: 'deposit',
-        amount: depositAmount,
-        description: `Deposit via ${method}`,
+        amount: topUpAmount,
+        description: `Top up via ${method}`,
         date: new Date().toISOString(),
       }));
 
-      Alert.alert('Success', 'Deposit successful!');
-      navigation.goBack();
+      Alert.alert('Success', 'Top up successful!');
+      onBack();
     } catch (error: any) {
       Alert.alert('Error', error.message);
     } finally {
@@ -68,59 +63,34 @@ export default function DepositScreen() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
-      <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-        <View style={{ padding: theme.spacing.xl }}>
-          <View style={{ alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
-            <View style={{
-              width: 80,
-              height: 80,
-              borderRadius: theme.borderRadius.full,
-              backgroundColor: theme.colors.warning,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: theme.spacing.lg,
-              ...theme.shadows.md
-            }}>
-              <Text style={{
-                fontSize: theme.typography.fontSize.xxxl,
-                color: theme.colors.secondary,
-                fontWeight: theme.typography.fontWeight.bold
-              }}>
-                +
-              </Text>
-            </View>
-            <Text style={{
-              fontSize: theme.typography.fontSize.xxxl,
-              fontWeight: theme.typography.fontWeight.bold,
-              color: theme.colors.text,
-              textAlign: 'center',
-              marginBottom: theme.spacing.sm
-            }}>
-              Deposit Money
-            </Text>
-            <Text style={{
-              fontSize: theme.typography.fontSize.md,
-              color: theme.colors.textSecondary,
-              textAlign: 'center'
-            }}>
-              Add funds to your wallet securely
-            </Text>
-          </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#1C1C23' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#1C1C23" />
+      <View style={{ marginTop: theme.spacing.lg, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={onBack} style={{ marginRight: theme.spacing.md }}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={{ color: 'white', fontSize: theme.typography.fontSize.xl, fontWeight: 'bold' }}>Top Up</Text>
+        </View>
+      </View>
 
-          <View style={{ marginBottom: theme.spacing.xxl }}>
+      <ScrollView style={{ flex: 1, backgroundColor: '#1C1C23' }}>
+        <View style={{ padding: theme.spacing.lg }}>
+          <View style={{ marginBottom: theme.spacing.xl }}>
             <Input
               label="Amount"
-              placeholder="Enter amount to deposit"
+              placeholder="Enter amount to top up"
               value={amount}
               onChangeText={setAmount}
               keyboardType="numeric"
+              labelStyle={{ color: 'white' }}
+              inputStyle={{ color: 'white' }}
+              placeholderTextColor="#A0A0A0"
             />
 
             <View style={{ marginBottom: theme.spacing.lg }}>
               <Text style={{
-                color: theme.colors.text,
+                color: 'white',
                 fontWeight: theme.typography.fontWeight.medium,
                 marginBottom: theme.spacing.md,
                 fontSize: theme.typography.fontSize.md
@@ -137,9 +107,8 @@ export default function DepositScreen() {
                       padding: theme.spacing.md,
                       borderRadius: theme.borderRadius.lg,
                       borderWidth: 2,
-                      borderColor: method === paymentMethod.key ? theme.colors.primary : theme.colors.border,
-                      backgroundColor: method === paymentMethod.key ? `${theme.colors.primary}10` : theme.colors.surface,
-                      ...theme.shadows.sm
+                      borderColor: method === paymentMethod.key ? '#FF4D6D' : '#2A2A37',
+                      backgroundColor: method === paymentMethod.key ? '#393948' : '#2A2A37',
                     }}
                     onPress={() => setMethod(paymentMethod.key)}
                   >
@@ -152,7 +121,7 @@ export default function DepositScreen() {
                     <Text style={{
                       fontSize: theme.typography.fontSize.md,
                       fontWeight: theme.typography.fontWeight.medium,
-                      color: theme.colors.text
+                      color: 'white'
                     }}>
                       {paymentMethod.label}
                     </Text>
@@ -163,14 +132,17 @@ export default function DepositScreen() {
           </View>
 
           <Button
-            title="Deposit Money"
-            onPress={handleDeposit}
+            title="Top Up"
+            onPress={handleTopUp}
             loading={loading}
             disabled={!amount}
             size="lg"
+            style={{ backgroundColor: '#FF4D6D' }}
           />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
+
+export default TopUpPage;

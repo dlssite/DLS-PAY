@@ -3,7 +3,7 @@ import { View, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { authService } from '../services/authService';
-
+import { theme } from '../theme';
 
 
 type RootStackParamList = {
@@ -37,7 +37,7 @@ export default function SplashScreen() {
   }, [navigation]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#3B82F6', alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ marginTop: theme.spacing.lg, flex: 1, backgroundColor: '#3B82F6', alignItems: 'center', justifyContent: 'center' }}>
       <Image
         source={require('../../assets/icon.png')}
         style={{ width: 96, height: 96, marginBottom: 16 }}

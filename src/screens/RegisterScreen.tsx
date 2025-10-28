@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView, SafeAreaView, StatusBar, useColorScheme, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDispatch } from 'react-redux';
@@ -7,7 +7,7 @@ import { setUser, setLoading } from '../store/slices/authSlice';
 import { authService } from '../services/authService';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { theme } from '../theme';
+import { enhancedTheme } from '../enhanced-theme';
 
 type RootStackParamList = {
   Register: undefined;
@@ -25,6 +25,10 @@ export default function RegisterScreen() {
   const [loading, setLocalLoading] = useState(false);
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const dispatch = useDispatch();
+  const colorScheme = useColorScheme();
+  const [isDarkMode, setIsDarkMode] = useState(colorScheme === 'dark');
+
+  const theme = isDarkMode ? enhancedTheme.dark : enhancedTheme.light;
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword || !phone) {
@@ -51,13 +55,17 @@ export default function RegisterScreen() {
       dispatch(setLoading(false));
     }
   };
+  
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
       <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }}>
         <View style={{ padding: theme.spacing.xl }}>
-          <View style={{ alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
+          <View style={{ marginTop: theme.spacing.lg, alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
             <View style={{
               width: 80,
               height: 80,
@@ -70,7 +78,7 @@ export default function RegisterScreen() {
             }}>
               <Text style={{
                 fontSize: theme.typography.fontSize.xxxl,
-                color: theme.colors.secondary,
+                color: theme.colors.text,
                 fontWeight: theme.typography.fontWeight.bold
               }}>
                 +
@@ -157,6 +165,18 @@ export default function RegisterScreen() {
                 Sign in
               </Text>
             </TouchableOpacity>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: theme.spacing.lg }}>
+            <Text style={{ color: theme.colors.text, marginRight: theme.spacing.sm }}>
+              {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+            </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: theme.colors.primaryLight }}
+              thumbColor={isDarkMode ? theme.colors.primary : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleTheme}
+              value={isDarkMode}
+            />
           </View>
         </View>
       </ScrollView>

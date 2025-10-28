@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, SafeAreaView, StatusBar, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDispatch } from 'react-redux';
@@ -7,7 +8,7 @@ import { setUser, setLoading } from '../store/slices/authSlice';
 import { authService } from '../services/authService';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 
 type RootStackParamList = {
   Login: undefined;
@@ -23,6 +24,7 @@ export default function LoginScreen() {
   const [loading, setLocalLoading] = useState(false);
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const dispatch = useDispatch();
+  const { theme, isDarkMode, toggleTheme } = useTheme();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -57,7 +59,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
       <View style={{
         flex: 1,
         backgroundColor: theme.colors.background,
@@ -66,7 +68,7 @@ export default function LoginScreen() {
         justifyContent: 'center'
       }}>
         {/* Header */}
-        <View style={{ alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
+        <View style={{ marginTop: theme.spacing.lg, alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
           <View style={{
             width: 80,
             height: 80,
@@ -79,7 +81,7 @@ export default function LoginScreen() {
           }}>
             <Text style={{
               fontSize: theme.typography.fontSize.xxxl,
-              color: theme.colors.secondary,
+              color: theme.colors.text,
               fontWeight: theme.typography.fontWeight.bold
             }}>
               ₦
@@ -161,7 +163,7 @@ export default function LoginScreen() {
             color: theme.colors.textSecondary,
             fontSize: theme.typography.fontSize.md
           }}>
-            Don't have an account?{' '}
+            Don\'t have an account?{' '}
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text style={{
@@ -172,6 +174,18 @@ export default function LoginScreen() {
               Sign up
             </Text>
           </TouchableOpacity>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: theme.spacing.lg }}>
+          <Text style={{ color: theme.colors.text, marginRight: theme.spacing.sm }}>
+            {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+          </Text>
+          <Switch
+            trackColor={{ false: "#767577", true: theme.colors.primaryLight }}
+            thumbColor={isDarkMode ? theme.colors.primary : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleTheme}
+            value={isDarkMode}
+          />
         </View>
       </View>
     </SafeAreaView>

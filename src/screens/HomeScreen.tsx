@@ -1,234 +1,145 @@
-import React, { useEffect } from 'react';
+
+import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, StatusBar } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { RootState } from '../store';
-import { setBalance } from '../store/slices/walletSlice';
-import { walletService } from '../services/walletService';
 import { theme } from '../theme';
+import PromotionCard from '../components/PromotionCard';
+import TransactionCard, { TransactionGroup } from '../components/TransactionCard';
+import { mockTransactions, activePromotions, mockUsers } from '../mockData';
+import CompatibleGames from '../components/CompatibleGames';
+import Header from '../components/Header';
+
+// Helper function to group transactions by date
+const groupTransactionsByDate = (transactions: any[]): TransactionGroup[] => {
+  const grouped: { [key: string]: any[] } = {};
+  transactions.forEach(tx => {
+    const date = new Date(tx.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    if (!grouped[date]) {
+      grouped[date] = [];
+    }
+    grouped[date].push(tx);
+  });
+
+  return Object.keys(grouped).map(date => ({
+    date,
+    items: grouped[date].map(tx => ({ ...tx, subAmount: `$${tx.amount.toFixed(2)}` }))
+  }));
+};
 
 type RootStackParamList = {
-  MainTabs: undefined;
-  Deposit: undefined;
-  Withdraw: undefined;
+  MainTabs: { screen: string };
+  TransactionHistory: undefined;
+  Transfer: undefined;
+  TopUp: undefined;
+  Settings: undefined;
 };
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const dispatch = useDispatch();
-  const { balance, currency } = useSelector((state: RootState) => state.wallet);
-  const { user } = useSelector((state: RootState) => state.auth);
+  
+  // Get user and transactions from mock data
+  const user = mockUsers[0];
+  const recentTransactions = mockTransactions.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 3);
+  const transactionGroups = groupTransactionsByDate(recentTransactions);
 
-  useEffect(() => {
-    const loadBalance = async () => {
-      if (user?.uid) {
-        try {
-          const userBalance = await walletService.getBalance(user.uid);
-          dispatch(setBalance(userBalance));
-        } catch (error) {
-          console.error('Error loading balance:', error);
-        }
-      }
-    };
-
-    loadBalance();
-  }, [user, dispatch]);
-
-  const quickActions = [
-    {
-      title: 'Send Money',
-      icon: 'send',
-      onPress: () => navigation.navigate('MainTabs' as any),
-      color: theme.colors.primary,
-    },
-    {
-      title: 'Receive Money',
-      icon: 'qr-code',
-      onPress: () => navigation.navigate('MainTabs' as any),
-      color: theme.colors.success,
-    },
-    {
-      title: 'Deposit',
-      icon: 'add-circle',
-      onPress: () => navigation.navigate('Deposit'),
-      color: theme.colors.warning,
-    },
-    {
-      title: 'Withdraw',
-      icon: 'remove-circle',
-      onPress: () => navigation.navigate('Withdraw'),
-      color: theme.colors.error,
-    },
-  ];
+  // Navigation handlers
+  const onSeeAll = () => navigation.navigate('MainTabs', { screen: 'History' });
+  const onTransfer = () => navigation.navigate('Transfer');
+  const onTopUp = () => navigation.navigate('TopUp');
+  const onSettings = () => navigation.navigate('Settings');
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.primary }}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary} />
-      <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-        {/* Header */}
-        <View style={{
-          backgroundColor: theme.colors.primary,
-          paddingHorizontal: theme.spacing.xl,
-          paddingVertical: theme.spacing.xxl,
-          paddingTop: theme.spacing.xxxl
-        }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.lg }}>
-            <View>
-              <Text style={{
-                color: theme.colors.secondary,
-                fontSize: theme.typography.fontSize.lg,
-                fontWeight: theme.typography.fontWeight.medium,
-                marginBottom: theme.spacing.xs
-              }}>
-                Welcome back
-              </Text>
-              <Text style={{
-                color: theme.colors.secondary,
-                fontSize: theme.typography.fontSize.xl,
-                fontWeight: theme.typography.fontWeight.bold
-              }}>
-                {user?.email?.split('@')[0] || 'User'}
-              </Text>
-            </View>
-            <TouchableOpacity style={{
-              width: 48,
-              height: 48,
-              borderRadius: theme.borderRadius.full,
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Ionicons name="notifications" size={24} color={theme.colors.secondary} />
-            </TouchableOpacity>
-          </View>
-
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#1C1C23' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#1C1C23" />
+      <Header onSettingsPress={onSettings} />
+      <ScrollView>
+        {/* Balance Card */}
+        <View style={{ paddingHorizontal: theme.spacing.lg }}>
           <View style={{
-            backgroundColor: theme.colors.surface,
+            backgroundColor: '#2A2A37',
             borderRadius: theme.borderRadius.lg,
-            padding: theme.spacing.xl,
-            marginTop: theme.spacing.lg,
-            ...theme.shadows.md
+            padding: theme.spacing.lg,
           }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.sm }}>
-              <Text style={{
-                color: theme.colors.textSecondary,
-                fontSize: theme.typography.fontSize.md,
-                fontWeight: theme.typography.fontWeight.medium
-              }}>
-                Current Balance
-              </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={{ color: 'white', fontSize: 36, fontWeight: 'bold' }}>${user.balance.toFixed(2)}</Text>
+                  <TouchableOpacity style={{ marginLeft: theme.spacing.sm }}>
+                    <Ionicons name="chevron-down-outline" size={20} color="white" />
+                  </TouchableOpacity>
+                </View>
+                <Text style={{ color: '#A0A0A0', fontSize: theme.typography.fontSize.sm }}>USD</Text>
+              </View>
               <TouchableOpacity>
-                <Ionicons name="eye" size={20} color={theme.colors.textSecondary} />
+                <Ionicons name="ellipsis-horizontal" size={24} color="white" />
               </TouchableOpacity>
             </View>
-            <Text style={{
-              color: theme.colors.text,
-              fontSize: theme.typography.fontSize.xxxl,
-              fontWeight: theme.typography.fontWeight.bold
-            }}>
-              {currency} {balance.toFixed(2)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Quick Actions */}
-        <View style={{ padding: theme.spacing.xl }}>
-          <Text style={{
-            fontSize: theme.typography.fontSize.xl,
-            fontWeight: theme.typography.fontWeight.bold,
-            color: theme.colors.text,
-            marginBottom: theme.spacing.lg
-          }}>
-            Quick Actions
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {quickActions.map((action, index) => (
+            <View style={{ flexDirection: 'row', marginTop: theme.spacing.lg }}>
               <TouchableOpacity
-                key={index}
+                onPress={onTransfer}
                 style={{
-                  backgroundColor: theme.colors.surface,
-                  width: '48%',
-                  padding: theme.spacing.lg,
-                  borderRadius: theme.borderRadius.lg,
-                  alignItems: 'center',
-                  marginBottom: theme.spacing.md,
-                  ...theme.shadows.sm,
-                }}
-                onPress={action.onPress}
-              >
-                <View style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: theme.borderRadius.full,
-                  backgroundColor: `${action.color}15`,
+                  flex: 1,
+                  backgroundColor: '#393948',
+                  paddingVertical: theme.spacing.md,
+                  borderRadius: theme.borderRadius.md,
+                  flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: theme.spacing.sm
+                  marginRight: theme.spacing.sm,
                 }}>
-                  <Ionicons name={action.icon as any} size={28} color={action.color} />
-                </View>
-                <Text style={{
-                  fontSize: theme.typography.fontSize.md,
-                  fontWeight: theme.typography.fontWeight.semibold,
-                  color: theme.colors.text,
-                  textAlign: 'center'
-                }}>
-                  {action.title}
-                </Text>
+                <Ionicons name="swap-horizontal" size={16} color="white" />
+                <Text style={{ color: 'white', marginLeft: theme.spacing.sm }}>Transfer</Text>
               </TouchableOpacity>
-            ))}
+              <TouchableOpacity
+                onPress={onTopUp}
+                style={{
+                  flex: 1,
+                  backgroundColor: '#FF4D6D',
+                  paddingVertical: theme.spacing.md,
+                  borderRadius: theme.borderRadius.md,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: theme.spacing.sm,
+                }}>
+                <Ionicons name="add" size={20} color="white" />
+                <Text style={{ color: 'white', marginLeft: theme.spacing.sm }}>Top Up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
-        {/* Recent Transactions */}
-        <View style={{ padding: theme.spacing.xl, paddingTop: 0 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.lg }}>
-            <Text style={{
-              fontSize: theme.typography.fontSize.xl,
-              fontWeight: theme.typography.fontWeight.bold,
-              color: theme.colors.text
-            }}>
-              Recent Transactions
-            </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('MainTabs' as any)}>
-              <Text style={{
-                color: theme.colors.primary,
-                fontSize: theme.typography.fontSize.md,
-                fontWeight: theme.typography.fontWeight.semibold
-              }}>
-                View All
-              </Text>
+        {/* Active Promotions */}
+        <View style={{ paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl }}>
+          <Text style={{ color: 'white', fontSize: theme.typography.fontSize.lg, fontWeight: 'bold', marginBottom: theme.spacing.md }}>
+            Active Promotions
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {activePromotions.map((promo, index) => (
+              <PromotionCard key={index} promo={promo} />
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Transactions */}
+        <View style={{ paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.md }}>
+            <Text style={{ color: 'white', fontSize: theme.typography.fontSize.lg, fontWeight: 'bold' }}>Transactions</Text>
+            <TouchableOpacity onPress={onSeeAll}>
+              <Text style={{ color: '#FF4D6D' }}>See all</Text>
             </TouchableOpacity>
           </View>
-          <View style={{
-            backgroundColor: theme.colors.surface,
-            borderRadius: theme.borderRadius.lg,
-            padding: theme.spacing.xl,
-            alignItems: 'center',
-            ...theme.shadows.sm
-          }}>
-            <Ionicons name="receipt" size={48} color={theme.colors.textSecondary} style={{ marginBottom: theme.spacing.md }} />
-            <Text style={{
-              color: theme.colors.textSecondary,
-              fontSize: theme.typography.fontSize.md,
-              textAlign: 'center'
-            }}>
-              No recent transactions
-            </Text>
-            <Text style={{
-              color: theme.colors.textSecondary,
-              fontSize: theme.typography.fontSize.sm,
-              textAlign: 'center',
-              marginTop: theme.spacing.xs
-            }}>
-              Your transaction history will appear here
-            </Text>
-          </View>
+          {transactionGroups.map((group, index) => (
+            <TransactionCard key={index} group={group} />
+          ))}
         </View>
+
+        {/* AppCoins Compatible Games */}
+        <CompatibleGames />
       </ScrollView>
     </SafeAreaView>
   );
