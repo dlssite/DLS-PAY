@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Alert, ScrollView, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, Alert, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { updateBalance } from '../store/slices/walletSlice';
@@ -7,19 +8,18 @@ import { addTransaction } from '../store/slices/transactionSlice';
 import { walletService } from '../services/walletService';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-interface TopUpPageProps {
-  onBack: () => void;
-}
-
-const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
+const TopUpPage: React.FC = () => {
+  const navigation = useNavigation();
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState('card');
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { theme } = useTheme();
 
   const handleTopUp = async () => {
     if (!amount) {
@@ -48,7 +48,7 @@ const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
       }));
 
       Alert.alert('Success', 'Top up successful!');
-      onBack();
+      navigation.goBack();
     } catch (error: any) {
       Alert.alert('Error', error.message);
     } finally {
@@ -63,18 +63,18 @@ const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1C1C23' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#1C1C23" />
-      <View style={{ marginTop: theme.spacing.lg, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
+      <View style={{ marginTop: theme.spacing.xxl, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={onBack} style={{ marginRight: theme.spacing.md }}>
-            <Ionicons name="arrow-back" size={24} color="white" />
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: theme.spacing.md }}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <Text style={{ color: 'white', fontSize: theme.typography.fontSize.xl, fontWeight: 'bold' }}>Top Up</Text>
+          <Text style={{ color: theme.colors.text, fontSize: theme.typography.fontSize.xl, fontWeight: 'bold' }}>Top Up</Text>
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1, backgroundColor: '#1C1C23' }}>
+      <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }}>
         <View style={{ padding: theme.spacing.lg }}>
           <View style={{ marginBottom: theme.spacing.xl }}>
             <Input
@@ -83,14 +83,14 @@ const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
               value={amount}
               onChangeText={setAmount}
               keyboardType="numeric"
-              labelStyle={{ color: 'white' }}
-              inputStyle={{ color: 'white' }}
-              placeholderTextColor="#A0A0A0"
+              labelStyle={{ color: theme.colors.text }}
+              inputStyle={{ color: theme.colors.text }}
+              placeholderTextColor={theme.colors.textSecondary}
             />
 
             <View style={{ marginBottom: theme.spacing.lg }}>
               <Text style={{
-                color: 'white',
+                color: theme.colors.text,
                 fontWeight: theme.typography.fontWeight.medium,
                 marginBottom: theme.spacing.md,
                 fontSize: theme.typography.fontSize.md
@@ -107,8 +107,8 @@ const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
                       padding: theme.spacing.md,
                       borderRadius: theme.borderRadius.lg,
                       borderWidth: 2,
-                      borderColor: method === paymentMethod.key ? '#FF4D6D' : '#2A2A37',
-                      backgroundColor: method === paymentMethod.key ? '#393948' : '#2A2A37',
+                      borderColor: method === paymentMethod.key ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: method === paymentMethod.key ? theme.colors.surface : theme.colors.surface,
                     }}
                     onPress={() => setMethod(paymentMethod.key)}
                   >
@@ -121,7 +121,7 @@ const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
                     <Text style={{
                       fontSize: theme.typography.fontSize.md,
                       fontWeight: theme.typography.fontWeight.medium,
-                      color: 'white'
+                      color: theme.colors.text
                     }}>
                       {paymentMethod.label}
                     </Text>
@@ -137,12 +137,12 @@ const TopUpPage: React.FC<TopUpPageProps> = ({ onBack }) => {
             loading={loading}
             disabled={!amount}
             size="lg"
-            style={{ backgroundColor: '#FF4D6D' }}
+            style={{ backgroundColor: theme.colors.primary }}
           />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 export default TopUpPage;

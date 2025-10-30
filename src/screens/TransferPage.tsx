@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StatusBar, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,9 +10,11 @@ import { addTransaction } from '../store/slices/transactionSlice';
 import { walletService } from '../services/walletService';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
+import { useNavigation } from '@react-navigation/native';
 
 const SendTab = () => {
+  const navigation = useNavigation();
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -19,6 +22,7 @@ const SendTab = () => {
   const dispatch = useDispatch();
   const { balance, currency } = useSelector((state: RootState) => state.wallet);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { theme } = useTheme();
 
   const handleSendMoney = async () => {
     if (!recipient || !amount) {
@@ -65,7 +69,7 @@ const SendTab = () => {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-        <View style={{ padding: theme.spacing.xl }}>
+        <View style={{ padding: theme.spacing.xl, }}>
           <View style={{ alignItems: 'center', marginBottom: theme.spacing.xxxl }}>
             
             <Text style={{
@@ -148,6 +152,7 @@ const SendTab = () => {
 const ReceiveTab = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const walletId = user?.uid || 'demo-wallet-id';
+  const { theme } = useTheme();
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -234,48 +239,48 @@ const ReceiveTab = () => {
   );
 };
 
-interface TransferPageProps {
-  onBack: () => void;
-}
 
-const TransferPage: React.FC<TransferPageProps> = ({ onBack }) => {
+
+const TransferPage: React.FC = () => {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('Send');
+  const { theme } = useTheme();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1C1C23' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#1C1C23" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
       <View style={{ marginTop: theme.spacing.lg, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={onBack} style={{ marginRight: theme.spacing.md }}>
-            <Ionicons name="arrow-back" size={24} color="white" />
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: theme.spacing.md }}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <Text style={{ color: 'white', fontSize: theme.typography.fontSize.xl, fontWeight: 'bold' }}>Transfer</Text>
+          <Text style={{ color: theme.colors.text, fontSize: theme.typography.fontSize.xl, fontWeight: 'bold' }}>Transfer</Text>
         </View>
       </View>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.lg }}>
-        <TouchableOpacity onPress={() => setActiveTab('Send')} style={{ 
+        <TouchableOpacity onPress={() => setActiveTab('Send')} style={{
           flex: 1,
-          paddingVertical: theme.spacing.md, 
-          borderBottomWidth: activeTab === 'Send' ? 2 : 0, 
-          borderBottomColor: '#FF4D6D' 
+          paddingVertical: theme.spacing.md,
+          borderBottomWidth: activeTab === 'Send' ? 2 : 0,
+          borderBottomColor: theme.colors.primary
         }}>
-          <Text style={{ 
-            color: activeTab === 'Send' ? '#FF4D6D' : 'white', 
-            textAlign: 'center', 
-            fontWeight: 'bold' 
+          <Text style={{
+            color: activeTab === 'Send' ? theme.colors.primary : theme.colors.text,
+            textAlign: 'center',
+            fontWeight: 'bold'
           }}>Send</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setActiveTab('Receive')} style={{ 
+        <TouchableOpacity onPress={() => setActiveTab('Receive')} style={{
           flex: 1,
-          paddingVertical: theme.spacing.md, 
-          borderBottomWidth: activeTab === 'Receive' ? 2 : 0, 
-          borderBottomColor: '#FF4D6D' 
+          paddingVertical: theme.spacing.md,
+          borderBottomWidth: activeTab === 'Receive' ? 2 : 0,
+          borderBottomColor: theme.colors.primary
         }}>
-          <Text style={{ 
-            color: activeTab === 'Receive' ? '#FF4D6D' : 'white', 
-            textAlign: 'center', 
-            fontWeight: 'bold' 
+          <Text style={{
+            color: activeTab === 'Receive' ? theme.colors.primary : theme.colors.text,
+            textAlign: 'center',
+            fontWeight: 'bold'
           }}>Receive</Text>
         </TouchableOpacity>
       </View>
@@ -283,6 +288,6 @@ const TransferPage: React.FC<TransferPageProps> = ({ onBack }) => {
       {activeTab === 'Send' ? <SendTab /> : <ReceiveTab />}
     </SafeAreaView>
   );
-};
+}
 
 export default TransferPage;

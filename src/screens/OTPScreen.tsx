@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Alert, TextInput, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, Alert, TextInput, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Button from '../components/Button';

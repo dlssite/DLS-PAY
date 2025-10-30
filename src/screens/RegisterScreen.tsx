@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView, SafeAreaView, StatusBar, useColorScheme, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView, StatusBar, useColorScheme, Switch } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDispatch } from 'react-redux';
@@ -98,7 +99,7 @@ export default function RegisterScreen() {
               color: theme.colors.textSecondary,
               textAlign: 'center'
             }}>
-              Join our E-Wallet community
+              Join our S-Wallet community
             </Text>
           </View>
 

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Ewallet",
-    "slug": "Ewallet",
+    "name": "Sanctyr Wallet",
+    "slug": "Swallet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

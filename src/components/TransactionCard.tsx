@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View, Text, Image } from 'react-native';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 
 export interface TransactionItem {
   type: string;
@@ -21,12 +21,14 @@ interface TransactionCardProps {
 }
 
 const TransactionCard: React.FC<TransactionCardProps> = ({ group }) => {
+  const { theme } = useTheme();
+
   return (
     <View style={{ marginBottom: theme.spacing.md }}>
-      <Text style={{ color: '#A0A0A0', fontSize: theme.typography.fontSize.sm, marginBottom: theme.spacing.sm }}>{group.date}</Text>
+      <Text style={{ color: theme.colors.textSecondary, fontSize: theme.typography.fontSize.sm, marginBottom: theme.spacing.sm }}>{group.date}</Text>
       {group.items.map((item, itemIndex) => (
         <View key={itemIndex} style={{
-          backgroundColor: '#2A2A37',
+          backgroundColor: theme.colors.surface,
           borderRadius: theme.borderRadius.lg,
           padding: theme.spacing.md,
           flexDirection: 'row',
@@ -37,18 +39,18 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ group }) => {
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: theme.spacing.sm }}>
             <Image source={item.image} style={{ width: 40, height: 40, borderRadius: theme.borderRadius.sm, marginRight: theme.spacing.md }} />
             <View style={{ flex: 1 }}>
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>{item.type}</Text>
-              <Text style={{ color: '#A0A0A0', fontSize: theme.typography.fontSize.sm, flexWrap: 'wrap' }}>{item.description}</Text>
+              <Text style={{ color: theme.colors.text, fontWeight: 'bold' }}>{item.type}</Text>
+              <Text style={{ color: theme.colors.textSecondary, fontSize: theme.typography.fontSize.sm, flexWrap: 'wrap' }}>{item.description}</Text>
             </View>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>{item.amount}</Text>
-            <Text style={{ color: '#A0A0A0', fontSize: theme.typography.fontSize.sm }}>{item.subAmount}</Text>
+            <Text style={{ color: theme.colors.text, fontWeight: 'bold' }}>{item.amount}</Text>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: theme.typography.fontSize.sm }}>{item.subAmount}</Text>
           </View>
         </View>
       ))}
     </View>
   );
-};
+}
 
 export default TransactionCard;

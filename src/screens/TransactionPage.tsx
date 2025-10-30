@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StatusBar, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 import TransactionCard, { TransactionGroup } from '../components/TransactionCard';
 import { mockTransactions } from '../mockData';
 
@@ -28,16 +29,17 @@ interface TransactionPageProps {
 
 const TransactionPage: React.FC<TransactionPageProps> = ({ onBack }) => {
   const transactionGroups: TransactionGroup[] = groupTransactionsByDate(mockTransactions);
+  const { theme } = useTheme();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1C1C23' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#1C1C23" />
-      <View style={{ paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
+      <View style={{ paddingHorizontal: theme.spacing.lg,  paddingTop: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={onBack} style={{ marginRight: theme.spacing.md }}>
-            <Ionicons name="arrow-back" size={24} color="white" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <Text style={{ color: 'white', fontSize: theme.typography.fontSize.xl, fontWeight: 'bold' }}>Transactions</Text>
+          <Text style={{ color: theme.colors.text, fontSize: theme.typography.fontSize.xl, fontWeight: 'bold' }}>Transactions</Text>
         </View>
       </View>
       <ScrollView style={{ flex: 1 }}>
@@ -49,6 +51,6 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ onBack }) => {
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 export default TransactionPage;

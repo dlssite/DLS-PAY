@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput, View, Text, TextInputProps, StyleSheet } from 'react-native';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
   label: string;
@@ -25,20 +25,30 @@ export default function Input({
   error,
   labelStyle,
   inputStyle,
-  placeholderTextColor = '#A0A0A0',
+  placeholderTextColor,
   ...props
 }: InputProps) {
+  const { theme } = useTheme();
+
   return (
-    <View style={styles.container}>
-      {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
+    <View style={{ marginBottom: theme.spacing.lg }}>
+      {label && <Text style={[{ color: theme.colors.text, fontWeight: 'bold', fontSize: theme.typography.fontSize.md, marginBottom: theme.spacing.sm }, labelStyle]}>{label}</Text>}
       <TextInput
         style={[
-          styles.input,
-          error ? styles.inputError : {},
+          {
+            borderWidth: 1,
+            borderColor: error ? theme.colors.error : theme.colors.border,
+            backgroundColor: theme.colors.surface,
+            color: theme.colors.text,
+            fontSize: theme.typography.fontSize.md,
+            paddingHorizontal: theme.spacing.md,
+            paddingVertical: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+          },
           inputStyle,
         ]}
         placeholder={placeholder}
-        placeholderTextColor={placeholderTextColor}
+        placeholderTextColor={placeholderTextColor || theme.colors.textSecondary}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
@@ -46,37 +56,9 @@ export default function Input({
         autoCapitalize="none"
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={{ color: theme.colors.error, fontSize: theme.typography.fontSize.sm, marginTop: theme.spacing.xs }}>{error}</Text>}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: theme.spacing.lg,
-  },
-  label: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginBottom: theme.spacing.sm,
-    fontSize: theme.typography.fontSize.md,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#2A2A37',
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    fontSize: theme.typography.fontSize.md,
-    color: 'white',
-    backgroundColor: '#2A2A37',
-  },
-  inputError: {
-    borderColor: theme.colors.error,
-  },
-  errorText: {
-    color: theme.colors.error,
-    fontSize: theme.typography.fontSize.sm,
-    marginTop: theme.spacing.xs,
-  },
-});
+// Styles are now inline to use theme dynamically

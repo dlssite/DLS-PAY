@@ -2,15 +2,18 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
 import RewardsScreen from '../screens/RewardsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
 export default function MainTabNavigator() {
+  const { theme } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -22,16 +25,18 @@ export default function MainTabNavigator() {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Rewards') {
             iconName = focused ? 'trophy' : 'trophy-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
           }
 
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#FF4D6D',
-        tabBarInactiveTintColor: '#A0A0A0',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.textSecondary,
         tabBarStyle: {
-            backgroundColor: '#1C1C23',
+            backgroundColor: theme.colors.background,
             borderTopWidth: 1,
-            borderTopColor: '#2A2A37',
+            borderTopColor: theme.colors.border,
             paddingTop: theme.spacing.sm,
             height: 90,
         },
@@ -43,6 +48,7 @@ export default function MainTabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Rewards" component={RewardsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

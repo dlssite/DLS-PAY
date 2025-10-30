@@ -81,10 +81,10 @@ export const enhancedTheme = {
   light: {
     ...common,
     colors: {
-      primary: '#FF7043', // Deep Orange
-      primaryLight: '#FF8A65',
-      primaryDark: '#F4511E',
-      secondary: '#FFCA28', // Amber
+      primary: '#FF4500', // Ember Red
+      primaryLight: '#FF6347',
+      primaryDark: '#DC143C',
+      secondary: '#FFD700', // Ember Yellow
       background: '#FFFFFF',
       surface: '#FAFAFA',
       text: '#212121',
@@ -93,25 +93,25 @@ export const enhancedTheme = {
       success: '#66BB6A',
       error: '#EF5350',
       warning: '#FFA726',
-      accent: '#FF7043',
+      accent: '#FF8C00', // Ember Orange
     },
   },
   dark: {
     ...common,
     colors: {
-      primary: '#FF7043', // Deep Orange
-      primaryLight: '#FF8A65',
-      primaryDark: '#F4511E',
-      secondary: '#FFCA28', // Amber
-      background: '#121212',
-      surface: '#212121',
+      primary: '#FF4500', // Ember Red
+      primaryLight: '#FF6347',
+      primaryDark: '#DC143C',
+      secondary: '#FFD700', // Ember Yellow
+      background: '#1C1C1C', // Dark background
+      surface: '#2A2A2A', // Dark surface
       text: '#FFFFFF',
       textSecondary: '#BDBDBD',
       border: '#424242',
       success: '#81C784',
       error: '#E57373',
       warning: '#FFB74D',
-      accent: '#FF7043',
+      accent: '#FF8C00', // Ember Orange
     },
   },
 };

@@ -3,7 +3,7 @@ import { View, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { authService } from '../services/authService';
-import { theme } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 
 
 type RootStackParamList = {
@@ -16,6 +16,7 @@ type SplashScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Splas
 
 export default function SplashScreen() {
   const navigation = useNavigation<SplashScreenNavigationProp>();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -37,14 +38,14 @@ export default function SplashScreen() {
   }, [navigation]);
 
   return (
-    <View style={{ marginTop: theme.spacing.lg, flex: 1, backgroundColor: '#3B82F6', alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ marginTop: theme.spacing.lg, flex: 1, backgroundColor: theme.colors.primary, alignItems: 'center', justifyContent: 'center' }}>
       <Image
         source={require('../../assets/icon.png')}
         style={{ width: 96, height: 96, marginBottom: 16 }}
         resizeMode="contain"
       />
-      <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold' }}>E-Wallet</Text>
-      <Text style={{ color: 'white', fontSize: 18, marginTop: 8 }}>Your Digital Wallet</Text>
+      <Text style={{ color: theme.colors.text, fontSize: 24, fontWeight: 'bold' }}>S-Wallet</Text>
+      <Text style={{ color: theme.colors.text, fontSize: 18, marginTop: 8 }}>Your Digital Wallet</Text>
     </View>
   );
 }

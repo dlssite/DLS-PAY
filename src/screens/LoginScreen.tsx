@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, StatusBar, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StatusBar, Switch } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDispatch } from 'react-redux';
@@ -101,7 +102,7 @@ export default function LoginScreen() {
             color: theme.colors.textSecondary,
             textAlign: 'center'
           }}>
-            Sign in to your E-Wallet account
+            Sign in to your S-Wallet account
           </Text>
         </View>
 

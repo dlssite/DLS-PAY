@@ -1,5 +1,5 @@
 
-// Mock data for testing the E-Wallet app before implementing authentication and database
+// Mock data for testing the S-Wallet app before implementing authentication and database
 
 export interface MockUser {
   id: string;

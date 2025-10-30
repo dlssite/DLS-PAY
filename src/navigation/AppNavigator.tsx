@@ -30,8 +30,8 @@ export default function AppNavigator() {
         <Stack.Screen name="OTP" component={OTPScreen} />
         <Stack.Screen name="MainTabs" component={MainTabNavigator} />
         <Stack.Screen name="TransactionHistory" component={TransactionPage} />
-        <Stack.Screen name="Transfer" component={TransferPage} />
-        <Stack.Screen name="TopUp" component={TopUpPage} />
+        <Stack.Screen name="Transfer" component={TransferPage} options={{ presentation: 'modal' }} />
+        <Stack.Screen name="TopUp" component={TopUpPage} options={{ presentation: 'modal' }} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="Bonus" component={BonusScreen} />
       </Stack.Navigator>

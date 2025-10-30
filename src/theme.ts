@@ -1,4 +1,4 @@
-// E-Wallet App Theme - Orange Accent
+// S-Wallet App Theme - Orange Accent
 export const theme = {
   colors: {
     primary: '#FF6B35', // Orange
