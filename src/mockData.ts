@@ -9,6 +9,7 @@ export interface MockUser {
   balance: number;
   walletId: string;
   createdAt: string;
+  isAdmin: boolean;
 }
 
 export interface MockTransaction {
@@ -34,6 +35,7 @@ export const mockUsers: MockUser[] = [
     balance: 1250.50,
     walletId: 'WAL123456789',
     createdAt: '2024-01-15T10:30:00Z',
+    isAdmin: false,
   },
   {
     id: 'user2',
@@ -43,6 +45,7 @@ export const mockUsers: MockUser[] = [
     balance: 890.75,
     walletId: 'WAL987654321',
     createdAt: '2024-02-20T14:15:00Z',
+    isAdmin: false,
   },
   {
     id: 'user3',
@@ -52,6 +55,7 @@ export const mockUsers: MockUser[] = [
     balance: 2100.00,
     walletId: 'WAL456789123',
     createdAt: '2024-03-10T09:45:00Z',
+    isAdmin: true,
   },
 ];
 
@@ -164,40 +168,77 @@ export const activePromotions = [
 ];
 
 
-// Mock API functions
-export const mockApi = {
-  // Auth functions
-  login: async (email: string, password: string) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  // Mock API functions
+  export const mockApi = {
+    // Wallet functions
+    createWallet: async (walletId: string, passcode?: string) => {
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const user = mockUsers.find(u => u.email === email);
-    if (user && password === 'password123') {
+      if (mockUsers.find(u => u.walletId === walletId)) {
+        throw new Error('Wallet ID already exists');
+      }
+
+      const newUser: MockUser = {
+        id: `user${mockUsers.length + 1}`,
+        email: `${walletId.toLowerCase()}@wallet.local`,
+        phone: '',
+        name: `Wallet ${walletId.slice(-4)}`,
+        balance: 0,
+        walletId,
+        createdAt: new Date().toISOString(),
+        isAdmin: false,
+      };
+
+      mockUsers.push(newUser);
+      return { success: true, user: newUser };
+    },
+
+    loginWithWallet: async (walletId: string, passcode?: string) => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const user = mockUsers.find(u => u.walletId === walletId);
+      if (!user) {
+        throw new Error('Wallet not found');
+      }
+
+      // For simplicity, we'll skip passcode validation in mock
+      // In real app, you'd validate the passcode here
       return { success: true, user };
-    }
-    throw new Error('Invalid credentials');
-  },
+    },
 
-  register: async (email: string, phone: string, password: string) => {
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Legacy auth functions (kept for compatibility)
+    login: async (email: string, password: string) => {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-    if (mockUsers.find(u => u.email === email)) {
-      throw new Error('User already exists');
-    }
+      const user = mockUsers.find(u => u.email === email);
+      if (user && password === 'password123') {
+        return { success: true, user };
+      }
+      throw new Error('Invalid credentials');
+    },
 
-    const newUser: MockUser = {
-      id: `user${mockUsers.length + 1}`,
-      email,
-      phone,
-      name: email.split('@')[0],
-      balance: 0,
-      walletId: `WAL${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      createdAt: new Date().toISOString(),
-    };
+    register: async (email: string, phone: string, password: string) => {
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-    mockUsers.push(newUser);
-    return { success: true, user: newUser };
-  },
+      if (mockUsers.find(u => u.email === email)) {
+        throw new Error('User already exists');
+      }
+
+      const newUser: MockUser = {
+        id: `user${mockUsers.length + 1}`,
+        email,
+        phone,
+        name: email.split('@')[0],
+        balance: 0,
+        walletId: `WAL${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+        createdAt: new Date().toISOString(),
+        isAdmin: false,
+      };
+
+      mockUsers.push(newUser);
+      return { success: true, user: newUser };
+    },
 
   // Wallet functions
   getBalance: async (userId: string) => {

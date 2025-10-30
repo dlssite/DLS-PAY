@@ -3,50 +3,72 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { mockApi, mockUsers } from '../mockData';
 
 export const authService = {
-  async loginWithEmail(email: string, password: string) {
+  // Generate a unique wallet ID
+  generateWalletId(): string {
+    return `WAL${Math.random().toString(36).substr(2, 9).toUpperCase()}${Date.now().toString().slice(-4)}`;
+  },
+
+  // Create a new wallet
+  async createWallet(passcode?: string) {
     try {
-      const result = await mockApi.login(email, password);
+      const walletId = this.generateWalletId();
+
+      // Create wallet in mock data
+      const result = await mockApi.createWallet(walletId, passcode);
+
+      // Store wallet data securely
       try {
-        await SecureStore.setItemAsync('userToken', result.user.id);
+        await SecureStore.setItemAsync('walletId', walletId);
+        if (passcode) {
+          await SecureStore.setItemAsync('walletPasscode', passcode);
+        }
       } catch (secureError) {
         console.log('SecureStore not available, proceeding without persistence', secureError);
       }
-      return { uid: result.user.id, email: result.user.email };
+
+      return { walletId, user: result.user };
     } catch (error) {
       throw error;
     }
   },
 
-  async registerWithEmail(email: string, password: string) {
+  // Login with existing wallet
+  async loginWithWallet(walletId: string, passcode?: string) {
     try {
-      // For mock, we'll use a simple phone number
-      const result = await mockApi.register(email, '+1234567890', password);
+      const result = await mockApi.loginWithWallet(walletId, passcode);
+
+      // Store wallet data securely
       try {
-        await SecureStore.setItemAsync('userToken', result.user.id);
+        await SecureStore.setItemAsync('walletId', walletId);
+        if (passcode) {
+          await SecureStore.setItemAsync('walletPasscode', passcode);
+        }
       } catch (secureError) {
         console.log('SecureStore not available, proceeding without persistence', secureError);
       }
-      return { uid: result.user.id, email: result.user.email };
+
+      return { walletId, user: result.user };
     } catch (error) {
       throw error;
     }
   },
 
-  async loginWithGoogle() {
+  // Get current wallet
+  async getCurrentWallet() {
     try {
-      // Mock Google login - return first user
-      const user = mockUsers[0];
-      try {
-        await SecureStore.setItemAsync('userToken', user.id);
-      } catch (secureError) {
-        console.log('SecureStore not available, proceeding without persistence', secureError);
+      const walletId = await SecureStore.getItemAsync('walletId');
+      if (walletId) {
+        const user = mockUsers.find(u => u.walletId === walletId);
+        return user ? { walletId, user } : null;
       }
-      return { uid: user.id, email: user.email };
+      return null;
     } catch (error) {
-      throw error;
+      console.log('SecureStore not available, returning null', error);
+      return null;
     }
   },
 
+  // Biometric login (unchanged)
   async biometricLogin() {
     try {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
@@ -59,21 +81,16 @@ export const authService = {
 
         if (result.success) {
           try {
-            const token = await SecureStore.getItemAsync('userToken');
-            if (token) {
-              return { uid: token };
+            const walletId = await SecureStore.getItemAsync('walletId');
+            if (walletId) {
+              const user = mockUsers.find(u => u.walletId === walletId);
+              return user ? { walletId, user } : null;
             }
           } catch (secureError) {
             console.log('SecureStore not available during biometric login', secureError);
           }
-          // If no stored token, use first mock user
-          const user = mockUsers[0];
-          try {
-            await SecureStore.setItemAsync('userToken', user.id);
-          } catch (secureError) {
-            console.log('SecureStore not available, proceeding without persistence', secureError);
-          }
-          return { uid: user.id };
+          // If no stored wallet, return null
+          return null;
         }
       }
       throw new Error('Biometric authentication failed');
@@ -82,25 +99,30 @@ export const authService = {
     }
   },
 
+  // Logout
   async logout() {
     try {
-      await SecureStore.deleteItemAsync('userToken');
+      await SecureStore.deleteItemAsync('walletId');
+      await SecureStore.deleteItemAsync('walletPasscode');
     } catch (error) {
       console.log('SecureStore not available during logout', error);
     }
   },
 
+  // Legacy methods (kept for compatibility but not used)
+  async loginWithEmail(email: string, password: string) {
+    throw new Error('Email login not supported. Use wallet authentication.');
+  },
+
+  async registerWithEmail(email: string, password: string) {
+    throw new Error('Email registration not supported. Use wallet creation.');
+  },
+
+  async loginWithGoogle() {
+    throw new Error('Google login not supported. Use wallet authentication.');
+  },
+
   async getCurrentUser() {
-    try {
-      const token = await SecureStore.getItemAsync('userToken');
-      if (token) {
-        const user = mockUsers.find(u => u.id === token);
-        return user ? { uid: user.id, email: user.email } : null;
-      }
-      return null;
-    } catch (error) {
-      console.log('SecureStore not available, returning null', error);
-      return null;
-    }
+    return this.getCurrentWallet();
   },
 };

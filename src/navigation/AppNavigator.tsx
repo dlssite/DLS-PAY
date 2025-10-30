@@ -7,7 +7,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import OTPScreen from '../screens/OTPScreen';
 import MainTabNavigator from './MainTabNavigator';
 import TransactionPage from '../screens/TransactionPage';
 import TransferPage from '../screens/TransferPage';
@@ -27,7 +26,6 @@ export default function AppNavigator() {
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="OTP" component={OTPScreen} />
         <Stack.Screen name="MainTabs" component={MainTabNavigator} />
         <Stack.Screen name="TransactionHistory" component={TransactionPage} />
         <Stack.Screen name="Transfer" component={TransferPage} options={{ presentation: 'modal' }} />

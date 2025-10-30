@@ -20,16 +20,16 @@ type RootStackParamList = {
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [walletId, setWalletId] = useState('');
+  const [passcode, setPasscode] = useState('');
   const [loading, setLocalLoading] = useState(false);
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const dispatch = useDispatch();
   const { theme, isDarkMode, toggleTheme } = useTheme();
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+    if (!walletId) {
+      Alert.alert('Error', 'Please enter your wallet ID');
       return;
     }
 
@@ -37,8 +37,8 @@ export default function LoginScreen() {
     dispatch(setLoading(true));
 
     try {
-      const user = await authService.loginWithEmail(email, password);
-      dispatch(setUser(user));
+      const result = await authService.loginWithWallet(walletId, passcode || undefined);
+      dispatch(setUser(result.user));
       navigation.replace('MainTabs');
     } catch (error: any) {
       Alert.alert('Login Failed', error.message);
@@ -50,9 +50,11 @@ export default function LoginScreen() {
 
   const handleBiometricLogin = async () => {
     try {
-      const user = await authService.biometricLogin();
-      dispatch(setUser(user));
-      navigation.replace('MainTabs');
+      const result = await authService.biometricLogin();
+      if (result) {
+        dispatch(setUser(result));
+        navigation.replace('MainTabs');
+      }
     } catch (error: any) {
       Alert.alert('Biometric Login Failed', error.message);
     }
@@ -95,51 +97,41 @@ export default function LoginScreen() {
             textAlign: 'center',
             marginBottom: theme.spacing.sm
           }}>
-            Welcome Back
+            Access Your Wallet
           </Text>
           <Text style={{
             fontSize: theme.typography.fontSize.md,
             color: theme.colors.textSecondary,
             textAlign: 'center'
           }}>
-            Sign in to your S-Wallet account
+            Enter your wallet ID to access your account
           </Text>
         </View>
 
         {/* Form */}
         <View style={{ marginBottom: theme.spacing.xxl }}>
           <Input
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
+            label="Wallet ID"
+            placeholder="Enter your wallet ID (e.g., WAL123ABC789)"
+            value={walletId}
+            onChangeText={setWalletId}
+            autoCapitalize="characters"
           />
 
           <Input
-            label="Password"
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
+            label="Passcode (Optional)"
+            placeholder="Enter passcode if set"
+            value={passcode}
+            onChangeText={setPasscode}
             secureTextEntry
+            keyboardType="numeric"
           />
-
-          <TouchableOpacity style={{ alignSelf: 'flex-end', marginBottom: theme.spacing.lg }}>
-            <Text style={{
-              color: theme.colors.primary,
-              fontSize: theme.typography.fontSize.sm,
-              fontWeight: theme.typography.fontWeight.medium
-            }}>
-              Forgot Password?
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Buttons */}
         <View style={{ gap: theme.spacing.md }}>
           <Button
-            title="Sign In"
+            title="Access Wallet"
             onPress={handleLogin}
             loading={loading}
             size="lg"
@@ -164,7 +156,7 @@ export default function LoginScreen() {
             color: theme.colors.textSecondary,
             fontSize: theme.typography.fontSize.md
           }}>
-            Don\'t have an account?{' '}
+            Don't have a wallet?{' '}
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text style={{
@@ -172,7 +164,7 @@ export default function LoginScreen() {
               fontSize: theme.typography.fontSize.md,
               fontWeight: theme.typography.fontWeight.semibold
             }}>
-              Sign up
+              Create One
             </Text>
           </TouchableOpacity>
         </View>

@@ -13,16 +13,14 @@ import { enhancedTheme } from '../enhanced-theme';
 type RootStackParamList = {
   Register: undefined;
   Login: undefined;
-  OTP: undefined;
+  MainTabs: undefined;
 };
 
 type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 export default function RegisterScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [phone, setPhone] = useState('');
+  const [passcode, setPasscode] = useState('');
+  const [confirmPasscode, setConfirmPasscode] = useState('');
   const [loading, setLocalLoading] = useState(false);
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const dispatch = useDispatch();
@@ -31,14 +29,9 @@ export default function RegisterScreen() {
 
   const theme = isDarkMode ? enhancedTheme.dark : enhancedTheme.light;
 
-  const handleRegister = async () => {
-    if (!email || !password || !confirmPassword || !phone) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+  const handleCreateWallet = async () => {
+    if (passcode && passcode !== confirmPasscode) {
+      Alert.alert('Error', 'Passcodes do not match');
       return;
     }
 
@@ -46,17 +39,26 @@ export default function RegisterScreen() {
     dispatch(setLoading(true));
 
     try {
-      const user = await authService.registerWithEmail(email, password);
-      dispatch(setUser(user));
-      navigation.navigate('OTP');
+      const result = await authService.createWallet(passcode || undefined);
+      dispatch(setUser(result.user));
+      Alert.alert(
+        'Wallet Created!',
+        `Your wallet ID is: ${result.walletId}\n\nKeep this ID safe - you'll need it to access your wallet.`,
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.replace('MainTabs')
+          }
+        ]
+      );
     } catch (error: any) {
-      Alert.alert('Registration Failed', error.message);
+      Alert.alert('Wallet Creation Failed', error.message);
     } finally {
       setLocalLoading(false);
       dispatch(setLoading(false));
     }
   };
-  
+
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
@@ -82,7 +84,7 @@ export default function RegisterScreen() {
                 color: theme.colors.text,
                 fontWeight: theme.typography.fontWeight.bold
               }}>
-                +
+                ₦
               </Text>
             </View>
             <Text style={{
@@ -92,55 +94,52 @@ export default function RegisterScreen() {
               textAlign: 'center',
               marginBottom: theme.spacing.sm
             }}>
-              Create Account
+              Create Your Wallet
             </Text>
             <Text style={{
               fontSize: theme.typography.fontSize.md,
               color: theme.colors.textSecondary,
               textAlign: 'center'
             }}>
-              Join our S-Wallet community
+              Get started with your digital wallet
             </Text>
           </View>
 
           <View style={{ marginBottom: theme.spacing.xxl }}>
-            <Input
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+            <Text style={{
+              fontSize: theme.typography.fontSize.md,
+              color: theme.colors.textSecondary,
+              textAlign: 'center',
+              marginBottom: theme.spacing.lg,
+              lineHeight: 20
+            }}>
+              Your wallet will be automatically assigned a unique ID. You can optionally set a passcode for additional security.
+            </Text>
 
             <Input
-              label="Phone Number"
-              placeholder="Enter your phone number"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-            />
-
-            <Input
-              label="Password"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
+              label="Passcode (Optional)"
+              placeholder="Set a 4-6 digit passcode"
+              value={passcode}
+              onChangeText={setPasscode}
               secureTextEntry
+              keyboardType="numeric"
+              maxLength={6}
             />
 
             <Input
-              label="Confirm Password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
+              label="Confirm Passcode"
+              placeholder="Confirm your passcode"
+              value={confirmPasscode}
+              onChangeText={setConfirmPasscode}
               secureTextEntry
+              keyboardType="numeric"
+              maxLength={6}
             />
           </View>
 
           <Button
-            title="Create Account"
-            onPress={handleRegister}
+            title="Create Wallet"
+            onPress={handleCreateWallet}
             loading={loading}
             size="lg"
           />
@@ -155,7 +154,7 @@ export default function RegisterScreen() {
               color: theme.colors.textSecondary,
               fontSize: theme.typography.fontSize.md
             }}>
-              Already have an account?{' '}
+              Already have a wallet?{' '}
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <Text style={{
@@ -163,7 +162,7 @@ export default function RegisterScreen() {
                 fontSize: theme.typography.fontSize.md,
                 fontWeight: theme.typography.fontWeight.semibold
               }}>
-                Sign in
+                Access It
               </Text>
             </TouchableOpacity>
           </View>
